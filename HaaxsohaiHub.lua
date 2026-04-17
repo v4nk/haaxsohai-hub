@@ -29,10 +29,12 @@ local diamondWaypoints = {
     Vector3.new(47.74, 621.59, -48.47)
 }
 
-local goldDelay = 0.6
-local goldWait = 14.9
-local diamondDelay = 0.7
-local diamondWait = 900
+-- ================== DELAY ĐÃ CHỈNH THÀNH 0.5 GIÂY ==================
+local goldDelay = 0.5      -- Gold delay
+local goldWait = 14.9      -- Gold đợi sau 1 vòng
+
+local diamondDelay = 0.5   -- Diamond delay
+local diamondWait = 900    -- Diamond đợi 15 phút
 
 local goldIndex = 1
 local diamondIndex = 1
@@ -80,7 +82,7 @@ ToggleBtn.Active = true
 Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(1, 0)
 Instance.new("UIStroke", ToggleBtn).Color = Color3.fromRGB(0, 255, 255)
 
--- [[ MAIN FRAME - ĐÃ NHỎ LẠI ]] --
+-- [[ MAIN FRAME ]] --
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.Position = UDim2.new(0.12, 0, 0.15, 0)
 MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
@@ -175,6 +177,7 @@ local function teleportTo(pos)
     end
 end
 
+-- ================== GOLD LOOP ==================
 local function goldLoop()
     while _G.Config.GoldEnabled do
         for i = 1, #goldWaypoints do
@@ -188,20 +191,27 @@ local function goldLoop()
     end
 end
 
+-- ================== DIAMOND LOOP ==================
 local function diamondLoop()
     while _G.Config.DiamondEnabled do
         for i = 1, #diamondWaypoints do
             if not _G.Config.DiamondEnabled then break end
+            
             teleportTo(diamondWaypoints[diamondIndex])
             diamondIndex = diamondIndex + 1
             if diamondIndex > #diamondWaypoints then diamondIndex = 1 end
+            
             task.wait(diamondDelay)
         end
-        if _G.Config.DiamondEnabled then task.wait(diamondWait) end
+
+        if _G.Config.DiamondEnabled then
+            MiniNotify("DIAMOND FARM: Hoàn thành 1 vòng - Đợi 15 phút")
+            task.wait(diamondWait)
+        end
     end
 end
 
--- Toggle Gold
+-- ================== TOGGLE GOLD ==================
 GoldBtn.MouseButton1Click:Connect(function()
     _G.Config.GoldEnabled = not _G.Config.GoldEnabled
     if _G.Config.GoldEnabled then
@@ -217,7 +227,7 @@ GoldBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Toggle Diamond
+-- ================== TOGGLE DIAMOND ==================
 DiamondBtn.MouseButton1Click:Connect(function()
     _G.Config.DiamondEnabled = not _G.Config.DiamondEnabled
     if _G.Config.DiamondEnabled then
@@ -239,4 +249,4 @@ ToggleBtn.MouseButton1Click:Connect(function()
     if MainFrame.Visible then ShowMenu("Main") end
 end)
 
-print("✅ Menu đã được thu nhỏ gọn gàng hơn!")
+print("✅ HAAXSOHAI HUB loaded - Delay Gold & Diamond = 0.5s")
