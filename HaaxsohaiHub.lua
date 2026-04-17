@@ -1,0 +1,242 @@
+-- [[ SYSTEM & SERVICES ]] --
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+
+local LP = Players.LocalPlayer
+
+-- [[ CONFIG ]] --
+_G.Config = { 
+    GoldEnabled = false,
+    DiamondEnabled = false,
+}
+
+local goldWaypoints = {
+    Vector3.new(41.32, 504.59, 51.67),
+    Vector3.new(-64.23, 504.59, 47.03),
+    Vector3.new(-48.08, 560.59, 14.17),
+    Vector3.new(49.07, 560.59, 0.25),
+    Vector3.new(-47.81, 621.59, -63.48),
+    Vector3.new(64.43, 637.59, -64.91),
+    Vector3.new(48.08, 702.59, 12.47)
+}
+
+local diamondWaypoints = {
+    Vector3.new(0.02, 130.59, 0.65),
+    Vector3.new(-49.21, 261.59, -37.39),
+    Vector3.new(-48.52, 458.59, 48.13),
+    Vector3.new(47.74, 621.59, -48.47)
+}
+
+local goldDelay = 0.6
+local goldWait = 14.9
+local diamondDelay = 0.7
+local diamondWait = 900
+
+local goldIndex = 1
+local diamondIndex = 1
+
+-- [[ UI INITIALIZATION ]] --
+local ScreenGui = Instance.new("ScreenGui", CoreGui)
+ScreenGui.Name = "HaaxsohaiHub"
+
+local function MiniNotify(text)
+    local nFrame = Instance.new("Frame", ScreenGui)
+    nFrame.Size = UDim2.new(0, 170, 0, 35)
+    nFrame.Position = UDim2.new(1, 10, 0.5, 0)
+    nFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    nFrame.BorderSizePixel = 0
+    Instance.new("UICorner", nFrame).CornerRadius = UDim.new(0, 8)
+    Instance.new("UIStroke", nFrame).Color = Color3.fromRGB(0, 255, 255)
+
+    local tLabel = Instance.new("TextLabel", nFrame)
+    tLabel.Size = UDim2.new(1, 0, 1, 0)
+    tLabel.Text = text:upper()
+    tLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    tLabel.Font = Enum.Font.SourceSansBold
+    tLabel.TextSize = 12
+    tLabel.BackgroundTransparency = 1
+
+    nFrame:TweenPosition(UDim2.new(1, -180, 0.5, 0), "Out", "Quart", 0.4, true)
+    task.delay(2.3, function()
+        nFrame:TweenPosition(UDim2.new(1, 10, 0.5, 0), "In", "Quart", 0.4, true, function()
+            nFrame:Destroy()
+        end)
+    end)
+end
+
+-- [[ ICON NGOÀI ]] --
+local ToggleBtn = Instance.new("TextButton", ScreenGui)
+ToggleBtn.Size = UDim2.new(0, 45, 0, 45)
+ToggleBtn.Position = UDim2.new(0.05, 0, 0.15, 0)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+ToggleBtn.Text = "HX"
+ToggleBtn.TextColor3 = Color3.fromRGB(0, 255, 255)
+ToggleBtn.Font = Enum.Font.LuckiestGuy
+ToggleBtn.TextSize = 23
+ToggleBtn.Draggable = true
+ToggleBtn.Active = true
+Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(1, 0)
+Instance.new("UIStroke", ToggleBtn).Color = Color3.fromRGB(0, 255, 255)
+
+-- [[ MAIN FRAME - ĐÃ NHỎ LẠI ]] --
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Position = UDim2.new(0.12, 0, 0.15, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+MainFrame.Visible = false
+MainFrame.Active = true
+MainFrame.Draggable = true
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
+Instance.new("UIStroke", MainFrame).Color = Color3.fromRGB(45, 45, 45)
+
+local MenuTitle = Instance.new("TextLabel", MainFrame)
+MenuTitle.Size = UDim2.new(1, 0, 0, 40)
+MenuTitle.Text = "HAAXSOHAI HUB"
+MenuTitle.TextColor3 = Color3.new(1, 1, 1)
+MenuTitle.Font = Enum.Font.SourceSansBold
+MenuTitle.TextSize = 15
+MenuTitle.BackgroundTransparency = 1
+
+-- Chữ credit dưới cùng
+local CreditLabel = Instance.new("TextLabel", MainFrame)
+CreditLabel.Size = UDim2.new(1, 0, 0, 18)
+CreditLabel.Position = UDim2.new(0, 0, 1, -22)
+CreditLabel.BackgroundTransparency = 1
+CreditLabel.Text = "by haaxsohai"
+CreditLabel.TextColor3 = Color3.fromRGB(110, 110, 110)
+CreditLabel.Font = Enum.Font.SourceSansItalic
+CreditLabel.TextSize = 12
+CreditLabel.TextTransparency = 0.4
+
+local function Resize(w, h) 
+    MainFrame.Size = UDim2.new(0, w, 0, h) 
+end
+
+local Menus = {}
+local function CreateFrame(name)
+    local f = Instance.new("Frame", MainFrame)
+    f.Size = UDim2.new(1, 0, 1, -65)
+    f.Position = UDim2.new(0, 0, 0, 45)
+    f.BackgroundTransparency = 1
+    f.Visible = false
+    Menus[name] = f
+    return f
+end
+
+local function ShowMenu(name)
+    for k, v in pairs(Menus) do v.Visible = (k == name) end
+    if name == "Main" then Resize(260, 165)
+    elseif name == "Farm" then Resize(260, 195) end
+end
+
+local MainM = CreateFrame("Main")
+local FarmM = CreateFrame("Farm")
+
+local function ApplyGrid(p, x, y)
+    local g = Instance.new("UIGridLayout", p)
+    g.CellSize = UDim2.new(0, x, 0, y)
+    g.CellPadding = UDim2.new(0, 8, 0, 10)
+    g.HorizontalAlignment = Enum.HorizontalAlignment.Center
+end
+
+ApplyGrid(MainM, 110, 35)
+ApplyGrid(FarmM, 110, 35)
+
+local function MakeButton(parent, label, clr, cb)
+    local b = Instance.new("TextButton", parent)
+    b.Font = Enum.Font.SourceSansBold
+    b.TextSize = 13
+    b.TextColor3 = Color3.new(1,1,1)
+    b.BackgroundColor3 = clr or Color3.fromRGB(35, 35, 35)
+    b.Text = label
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 7)
+    Instance.new("UIStroke", b).Color = Color3.fromRGB(60, 60, 60)
+
+    b.MouseButton1Click:Connect(function()
+        if cb then cb(b) end
+    end)
+    return b
+end
+
+-- ================== MAIN MENU ==================
+MakeButton(MainM, "FARM MENU", Color3.fromRGB(0, 102, 204), function() ShowMenu("Farm") end)
+
+-- ================== FARM MENU ==================
+local GoldBtn = MakeButton(FarmM, "GOLD FARM : OFF", Color3.fromRGB(200, 40, 40))
+local DiamondBtn = MakeButton(FarmM, "DIAMOND FARM : OFF", Color3.fromRGB(200, 40, 40))
+MakeButton(FarmM, "BACK", Color3.fromRGB(120, 30, 30), function() ShowMenu("Main") end)
+
+-- ================== TELEPORT FUNCTION ==================
+local function teleportTo(pos)
+    local char = LP.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        char.HumanoidRootPart.CFrame = CFrame.new(pos.X, pos.Y + 4, pos.Z)
+    end
+end
+
+local function goldLoop()
+    while _G.Config.GoldEnabled do
+        for i = 1, #goldWaypoints do
+            if not _G.Config.GoldEnabled then break end
+            teleportTo(goldWaypoints[goldIndex])
+            goldIndex = goldIndex + 1
+            if goldIndex > #goldWaypoints then goldIndex = 1 end
+            task.wait(goldDelay)
+        end
+        if _G.Config.GoldEnabled then task.wait(goldWait) end
+    end
+end
+
+local function diamondLoop()
+    while _G.Config.DiamondEnabled do
+        for i = 1, #diamondWaypoints do
+            if not _G.Config.DiamondEnabled then break end
+            teleportTo(diamondWaypoints[diamondIndex])
+            diamondIndex = diamondIndex + 1
+            if diamondIndex > #diamondWaypoints then diamondIndex = 1 end
+            task.wait(diamondDelay)
+        end
+        if _G.Config.DiamondEnabled then task.wait(diamondWait) end
+    end
+end
+
+-- Toggle Gold
+GoldBtn.MouseButton1Click:Connect(function()
+    _G.Config.GoldEnabled = not _G.Config.GoldEnabled
+    if _G.Config.GoldEnabled then
+        goldIndex = 1
+        GoldBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 80)
+        GoldBtn.Text = "GOLD FARM : ON"
+        MiniNotify("GOLD FARM ENABLED")
+        spawn(goldLoop)
+    else
+        GoldBtn.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
+        GoldBtn.Text = "GOLD FARM : OFF"
+        MiniNotify("GOLD FARM DISABLED")
+    end
+end)
+
+-- Toggle Diamond
+DiamondBtn.MouseButton1Click:Connect(function()
+    _G.Config.DiamondEnabled = not _G.Config.DiamondEnabled
+    if _G.Config.DiamondEnabled then
+        diamondIndex = 1
+        DiamondBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 80)
+        DiamondBtn.Text = "DIAMOND FARM : ON"
+        MiniNotify("DIAMOND FARM ENABLED")
+        spawn(diamondLoop)
+    else
+        DiamondBtn.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
+        DiamondBtn.Text = "DIAMOND FARM : OFF"
+        MiniNotify("DIAMOND FARM DISABLED")
+    end
+end)
+
+-- Mở menu
+ToggleBtn.MouseButton1Click:Connect(function() 
+    MainFrame.Visible = not MainFrame.Visible 
+    if MainFrame.Visible then ShowMenu("Main") end
+end)
+
+print("✅ Menu đã được thu nhỏ gọn gàng hơn!")
