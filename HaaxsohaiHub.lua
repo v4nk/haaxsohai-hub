@@ -1,5 +1,6 @@
 -- [[ SYSTEM & SERVICES ]] --
 local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
 
@@ -35,10 +36,10 @@ local eggPositions = {
     Hacker = Vector3.new(-13.76, 503.69, 76.01)
 }
 
-local goldDelay = 0.1
-local goldWait = 15
-local diamondDelay = 0.1
-local diamondWait = 905
+local goldDelay = 0.5
+local goldWait = 14.9
+local diamondDelay = 0.5
+local diamondWait = 900
 
 local goldIndex = 1
 local diamondIndex = 1
@@ -47,6 +48,7 @@ local diamondIndex = 1
 local ScreenGui = Instance.new("ScreenGui", CoreGui)
 ScreenGui.Name = "HaaxsohaiHub"
 
+-- Icon ngoài
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
 ToggleBtn.Size = UDim2.new(0, 45, 0, 45)
 ToggleBtn.Position = UDim2.new(0.05, 0, 0.15, 0)
@@ -60,6 +62,7 @@ ToggleBtn.Active = true
 Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(1, 0)
 Instance.new("UIStroke", ToggleBtn).Color = Color3.fromRGB(0, 255, 255)
 
+-- Main Frame
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.Position = UDim2.new(0.12, 0, 0.15, 0)
 MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
@@ -120,7 +123,7 @@ end
 
 ApplyGrid(MainM, 120, 38)
 ApplyGrid(FarmM, 110, 35)
-ApplyGrid(EggM, 82, 40)
+ApplyGrid(EggM, 85, 48)
 
 local function MakeButton(parent, label, clr, cb)
     local b = Instance.new("TextButton", parent)
@@ -138,16 +141,16 @@ local function MakeButton(parent, label, clr, cb)
     return b
 end
 
--- Main Menu
+-- ================== MAIN MENU ==================
 MakeButton(MainM, "FARM MENU", Color3.fromRGB(0, 102, 204), function() ShowMenu("Farm") end)
 MakeButton(MainM, "PET EGG", Color3.fromRGB(255, 140, 0), function() ShowMenu("Egg") end)
 
--- Farm Menu
+-- ================== FARM MENU ==================
 local GoldBtn = MakeButton(FarmM, "GOLD FARM : OFF", Color3.fromRGB(200, 40, 40))
 local DiamondBtn = MakeButton(FarmM, "DIAMOND FARM : OFF", Color3.fromRGB(200, 40, 40))
 MakeButton(FarmM, "BACK", Color3.fromRGB(120, 30, 30), function() ShowMenu("Main") end)
 
--- Pet Egg Menu
+-- ================== PET EGG MENU ==================
 local function teleportTo(pos)
     local char = LP.Character
     if char and char:FindFirstChild("HumanoidRootPart") then
@@ -166,7 +169,6 @@ local function goldLoop()
     while true do
         if not _G.Config.GoldEnabled then break end
 
-        -- Chạy hết 1 vòng
         for i = 1, #goldWaypoints do
             if not _G.Config.GoldEnabled then break end
             teleportTo(goldWaypoints[goldIndex])
@@ -175,7 +177,6 @@ local function goldLoop()
             task.wait(goldDelay)
         end
 
-        -- Đợi 14.9 giây
         if _G.Config.GoldEnabled then
             task.wait(goldWait)
         else
@@ -189,7 +190,6 @@ local function diamondLoop()
     while true do
         if not _G.Config.DiamondEnabled then break end
 
-        -- Chạy hết 1 vòng
         for i = 1, #diamondWaypoints do
             if not _G.Config.DiamondEnabled then break end
             teleportTo(diamondWaypoints[diamondIndex])
@@ -198,7 +198,6 @@ local function diamondLoop()
             task.wait(diamondDelay)
         end
 
-        -- Đợi 15 phút
         if _G.Config.DiamondEnabled then
             task.wait(diamondWait)
         else
@@ -207,7 +206,7 @@ local function diamondLoop()
     end
 end
 
--- Toggle Gold
+-- ================== TOGGLE GOLD ==================
 GoldBtn.MouseButton1Click:Connect(function()
     _G.Config.GoldEnabled = not _G.Config.GoldEnabled
     
@@ -222,7 +221,7 @@ GoldBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Toggle Diamond
+-- ================== TOGGLE DIAMOND ==================
 DiamondBtn.MouseButton1Click:Connect(function()
     _G.Config.DiamondEnabled = not _G.Config.DiamondEnabled
     
@@ -243,4 +242,4 @@ ToggleBtn.MouseButton1Click:Connect(function()
     if MainFrame.Visible then ShowMenu("Main") end
 end)
 
-print("✅ HAAXSOHAI HUB loaded - Kiểu hoàn thành vòng rồi mới dừng")
+print("✅ HAAXSOHAI HUB loaded - Farm kiểu hoàn thành vòng rồi mới dừng")
