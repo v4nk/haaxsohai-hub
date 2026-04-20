@@ -29,49 +29,24 @@ local diamondWaypoints = {
     Vector3.new(47.74, 621.59, -48.47)
 }
 
-local goldDelay = 0.1
-local goldWait = 15
-local diamondDelay = 0.1
-local diamondWait = 904
+local eggPositions = {
+    Noob   = Vector3.new(43.76, 1.70, -17.58),
+    Bacon  = Vector3.new(43.26, 1.70, -1.28),
+    Party  = Vector3.new(43.65, 1.70, 14.96),
+    Hacker = Vector3.new(-13.76, 503.69, 76.01)
+}
+
+local goldDelay = 0.5
+local goldWait = 14.9
+local diamondDelay = 0.5
+local diamondWait = 900
 
 local goldIndex = 1
 local diamondIndex = 1
 
--- [[ EGG POSITIONS ]] --
-local eggPositions = {
-    Noob  = Vector3.new(43.76, 1.70, -17.58),
-    Bacon = Vector3.new(43.26, 1.70, -1.28),
-    Party = Vector3.new(43.65, 1.70, 14.96),
-    Hacker = Vector3.new(-13.76, 503.69, 76.01)
-}
-
 -- [[ UI INITIALIZATION ]] --
 local ScreenGui = Instance.new("ScreenGui", CoreGui)
 ScreenGui.Name = "HaaxsohaiHub"
-
-local function MiniNotify(text)
-    local nFrame = Instance.new("Frame", ScreenGui)
-    nFrame.Size = UDim2.new(0, 180, 0, 36)
-    nFrame.Position = UDim2.new(1, 10, 0.5, 0)
-    nFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    Instance.new("UICorner", nFrame).CornerRadius = UDim.new(0, 8)
-    Instance.new("UIStroke", nFrame).Color = Color3.fromRGB(0, 255, 255)
-
-    local tLabel = Instance.new("TextLabel", nFrame)
-    tLabel.Size = UDim2.new(1, 0, 1, 0)
-    tLabel.Text = text:upper()
-    tLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    tLabel.Font = Enum.Font.SourceSansBold
-    tLabel.TextSize = 13
-    tLabel.BackgroundTransparency = 1
-
-    nFrame:TweenPosition(UDim2.new(1, -190, 0.5, 0), "Out", "Quart", 0.4, true)
-    task.delay(2.3, function()
-        nFrame:TweenPosition(UDim2.new(1, 10, 0.5, 0), "In", "Quart", 0.4, true, function()
-            nFrame:Destroy()
-        end)
-    end)
-end
 
 -- [[ ICON NGOÀI ]] --
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
@@ -105,6 +80,7 @@ MenuTitle.Font = Enum.Font.SourceSansBold
 MenuTitle.TextSize = 15
 MenuTitle.BackgroundTransparency = 1
 
+-- Chữ credit dưới cùng
 local CreditLabel = Instance.new("TextLabel", MainFrame)
 CreditLabel.Size = UDim2.new(1, 0, 0, 18)
 CreditLabel.Position = UDim2.new(0, 0, 1, -22)
@@ -115,7 +91,9 @@ CreditLabel.Font = Enum.Font.SourceSansItalic
 CreditLabel.TextSize = 12
 CreditLabel.TextTransparency = 0.4
 
-local function Resize(w, h) MainFrame.Size = UDim2.new(0, w, 0, h) end
+local function Resize(w, h) 
+    MainFrame.Size = UDim2.new(0, w, 0, h) 
+end
 
 local Menus = {}
 local function CreateFrame(name)
@@ -137,7 +115,7 @@ end
 
 local MainM = CreateFrame("Main")
 local FarmM = CreateFrame("Farm")
-local EggM  = CreateFrame("Egg")   -- Menu Pet Egg mới
+local EggM  = CreateFrame("Egg")
 
 local function ApplyGrid(p, x, y)
     local g = Instance.new("UIGridLayout", p)
@@ -168,7 +146,7 @@ end
 
 -- ================== MAIN MENU ==================
 MakeButton(MainM, "FARM MENU", Color3.fromRGB(0, 102, 204), function() ShowMenu("Farm") end)
-MakeButton(MainM, "PET EGG", Color3.fromRGB(255, 140, 0), function() ShowMenu("Egg") end)   -- Nút mới
+MakeButton(MainM, "PET EGG", Color3.fromRGB(255, 140, 0), function() ShowMenu("Egg") end)
 
 -- ================== FARM MENU ==================
 local GoldBtn = MakeButton(FarmM, "GOLD FARM : OFF", Color3.fromRGB(200, 40, 40))
@@ -180,29 +158,16 @@ local function teleportTo(pos)
     local char = LP.Character
     if char and char:FindFirstChild("HumanoidRootPart") then
         char.HumanoidRootPart.CFrame = CFrame.new(pos.X, pos.Y + 4, pos.Z)
-        MiniNotify("Teleported to Egg")
     end
 end
 
-MakeButton(EggM, "EGG NOOB", Color3.fromRGB(100, 100, 100), function()
-    teleportTo(eggPositions.Noob)
-end)
-
-MakeButton(EggM, "EGG BACON", Color3.fromRGB(180, 100, 50), function()
-    teleportTo(eggPositions.Bacon)
-end)
-
-MakeButton(EggM, "EGG PARTY", Color3.fromRGB(255, 100, 200), function()
-    teleportTo(eggPositions.Party)
-end)
-
-MakeButton(EggM, "EGG HACKER", Color3.fromRGB(0, 200, 100), function()
-    teleportTo(eggPositions.Hacker)
-end)
-
+MakeButton(EggM, "EGG NOOB", Color3.fromRGB(100, 100, 100), function() teleportTo(eggPositions.Noob) end)
+MakeButton(EggM, "EGG BACON", Color3.fromRGB(180, 100, 50), function() teleportTo(eggPositions.Bacon) end)
+MakeButton(EggM, "EGG PARTY", Color3.fromRGB(255, 100, 200), function() teleportTo(eggPositions.Party) end)
+MakeButton(EggM, "EGG HACKER", Color3.fromRGB(0, 200, 100), function() teleportTo(eggPositions.Hacker) end)
 MakeButton(EggM, "BACK", Color3.fromRGB(120, 30, 30), function() ShowMenu("Main") end)
 
--- ================== GOLD & DIAMOND LOOP (giữ nguyên) ==================
+-- ================== GOLD & DIAMOND LOOP ==================
 local function goldLoop()
     while _G.Config.GoldEnabled do
         for i = 1, #goldWaypoints do
@@ -226,40 +191,36 @@ local function diamondLoop()
             task.wait(diamondDelay)
         end
         if _G.Config.DiamondEnabled then
-            MiniNotify("DIAMOND FARM: Hoàn thành 1 vòng - Đợi 15 phút")
             task.wait(diamondWait)
         end
     end
 end
 
--- Toggle Gold & Diamond (giữ nguyên)
+-- Toggle Gold
 GoldBtn.MouseButton1Click:Connect(function()
     _G.Config.GoldEnabled = not _G.Config.GoldEnabled
     if _G.Config.GoldEnabled then
         goldIndex = 1
         GoldBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 80)
         GoldBtn.Text = "GOLD FARM : ON"
-        MiniNotify("GOLD FARM ENABLED")
         spawn(goldLoop)
     else
         GoldBtn.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
         GoldBtn.Text = "GOLD FARM : OFF"
-        MiniNotify("GOLD FARM DISABLED")
     end
 end)
 
+-- Toggle Diamond
 DiamondBtn.MouseButton1Click:Connect(function()
     _G.Config.DiamondEnabled = not _G.Config.DiamondEnabled
     if _G.Config.DiamondEnabled then
         diamondIndex = 1
         DiamondBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 80)
         DiamondBtn.Text = "DIAMOND FARM : ON"
-        MiniNotify("DIAMOND FARM ENABLED")
         spawn(diamondLoop)
     else
         DiamondBtn.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
         DiamondBtn.Text = "DIAMOND FARM : OFF"
-        MiniNotify("DIAMOND FARM DISABLED")
     end
 end)
 
@@ -269,4 +230,4 @@ ToggleBtn.MouseButton1Click:Connect(function()
     if MainFrame.Visible then ShowMenu("Main") end
 end)
 
-print("✅ HAAXSOHAI HUB loaded - Đã thêm chức năng Pet Egg!")
+print("✅ HAAXSOHAI HUB loaded - Đã xóa MiniNotify")
