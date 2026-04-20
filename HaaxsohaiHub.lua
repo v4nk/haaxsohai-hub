@@ -1,6 +1,5 @@
 -- [[ SYSTEM & SERVICES ]] --
 local RunService = game:GetService("RunService")
-local UIS = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
 
@@ -36,10 +35,10 @@ local eggPositions = {
     Hacker = Vector3.new(-13.76, 503.69, 76.01)
 }
 
-local goldDelay = 0.5
-local goldWait = 14.9
-local diamondDelay = 0.5
-local diamondWait = 900
+local goldDelay = 0.1
+local goldWait = 15
+local diamondDelay = 0.1
+local diamondWait = 905
 
 local goldIndex = 1
 local diamondIndex = 1
@@ -48,7 +47,6 @@ local diamondIndex = 1
 local ScreenGui = Instance.new("ScreenGui", CoreGui)
 ScreenGui.Name = "HaaxsohaiHub"
 
--- Icon ngoài
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
 ToggleBtn.Size = UDim2.new(0, 45, 0, 45)
 ToggleBtn.Position = UDim2.new(0.05, 0, 0.15, 0)
@@ -62,7 +60,6 @@ ToggleBtn.Active = true
 Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(1, 0)
 Instance.new("UIStroke", ToggleBtn).Color = Color3.fromRGB(0, 255, 255)
 
--- Main Frame
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.Position = UDim2.new(0.12, 0, 0.15, 0)
 MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
@@ -90,9 +87,7 @@ CreditLabel.Font = Enum.Font.SourceSansItalic
 CreditLabel.TextSize = 12
 CreditLabel.TextTransparency = 0.4
 
-local function Resize(w, h) 
-    MainFrame.Size = UDim2.new(0, w, 0, h) 
-end
+local function Resize(w, h) MainFrame.Size = UDim2.new(0, w, 0, h) end
 
 local Menus = {}
 local function CreateFrame(name)
@@ -109,20 +104,12 @@ local function ShowMenu(name)
     for k, v in pairs(Menus) do v.Visible = (k == name) end
     if name == "Main" then Resize(280, 190)
     elseif name == "Farm" then Resize(280, 195)
-    elseif name == "Egg" then Resize(280, 200) end   -- Giảm chiều cao menu Egg
+    elseif name == "Egg" then Resize(280, 200) end
 end
 
 local MainM = CreateFrame("Main")
 local FarmM = CreateFrame("Farm")
 local EggM  = CreateFrame("Egg")
-
--- Grid cho Egg Menu: 3 cột, nút nhỏ gọn hơn
-local function ApplyEggGrid(p)
-    local g = Instance.new("UIGridLayout", p)
-    g.CellSize = UDim2.new(0, 80, 0, 38)      -- Nhỏ và ngắn hơn nữa
-    g.CellPadding = UDim2.new(0, 8, 0, 10)
-    g.HorizontalAlignment = Enum.HorizontalAlignment.Center
-end
 
 local function ApplyGrid(p, x, y)
     local g = Instance.new("UIGridLayout", p)
@@ -133,16 +120,16 @@ end
 
 ApplyGrid(MainM, 120, 38)
 ApplyGrid(FarmM, 110, 35)
-ApplyEggGrid(EggM)
+ApplyGrid(EggM, 82, 40)
 
 local function MakeButton(parent, label, clr, cb)
     local b = Instance.new("TextButton", parent)
     b.Font = Enum.Font.SourceSansBold
-    b.TextSize = 12
+    b.TextSize = 13
     b.TextColor3 = Color3.new(1,1,1)
     b.BackgroundColor3 = clr or Color3.fromRGB(35, 35, 35)
     b.Text = label
-    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 7)
     Instance.new("UIStroke", b).Color = Color3.fromRGB(60, 60, 60)
 
     b.MouseButton1Click:Connect(function()
@@ -151,16 +138,16 @@ local function MakeButton(parent, label, clr, cb)
     return b
 end
 
--- ================== MAIN MENU ==================
+-- Main Menu
 MakeButton(MainM, "FARM MENU", Color3.fromRGB(0, 102, 204), function() ShowMenu("Farm") end)
 MakeButton(MainM, "PET EGG", Color3.fromRGB(255, 140, 0), function() ShowMenu("Egg") end)
 
--- ================== FARM MENU ==================
+-- Farm Menu
 local GoldBtn = MakeButton(FarmM, "GOLD FARM : OFF", Color3.fromRGB(200, 40, 40))
 local DiamondBtn = MakeButton(FarmM, "DIAMOND FARM : OFF", Color3.fromRGB(200, 40, 40))
 MakeButton(FarmM, "BACK", Color3.fromRGB(120, 30, 30), function() ShowMenu("Main") end)
 
--- ================== PET EGG MENU (3 cột - nhỏ gọn) ==================
+-- Pet Egg Menu
 local function teleportTo(pos)
     local char = LP.Character
     if char and char:FindFirstChild("HumanoidRootPart") then
@@ -174,9 +161,12 @@ MakeButton(EggM, "EGG PARTY", Color3.fromRGB(255, 100, 200), function() teleport
 MakeButton(EggM, "EGG HACKER", Color3.fromRGB(0, 200, 100), function() teleportTo(eggPositions.Hacker) end)
 MakeButton(EggM, "BACK", Color3.fromRGB(120, 30, 30), function() ShowMenu("Main") end)
 
--- ================== GOLD & DIAMOND LOOP ==================
+-- ================== GOLD LOOP (Hoàn thành vòng rồi mới dừng) ==================
 local function goldLoop()
-    while _G.Config.GoldEnabled do
+    while true do
+        if not _G.Config.GoldEnabled then break end
+
+        -- Chạy hết 1 vòng
         for i = 1, #goldWaypoints do
             if not _G.Config.GoldEnabled then break end
             teleportTo(goldWaypoints[goldIndex])
@@ -184,12 +174,22 @@ local function goldLoop()
             if goldIndex > #goldWaypoints then goldIndex = 1 end
             task.wait(goldDelay)
         end
-        if _G.Config.GoldEnabled then task.wait(goldWait) end
+
+        -- Đợi 14.9 giây
+        if _G.Config.GoldEnabled then
+            task.wait(goldWait)
+        else
+            break
+        end
     end
 end
 
+-- ================== DIAMOND LOOP (Hoàn thành vòng rồi mới dừng) ==================
 local function diamondLoop()
-    while _G.Config.DiamondEnabled do
+    while true do
+        if not _G.Config.DiamondEnabled then break end
+
+        -- Chạy hết 1 vòng
         for i = 1, #diamondWaypoints do
             if not _G.Config.DiamondEnabled then break end
             teleportTo(diamondWaypoints[diamondIndex])
@@ -197,13 +197,20 @@ local function diamondLoop()
             if diamondIndex > #diamondWaypoints then diamondIndex = 1 end
             task.wait(diamondDelay)
         end
-        if _G.Config.DiamondEnabled then task.wait(diamondWait) end
+
+        -- Đợi 15 phút
+        if _G.Config.DiamondEnabled then
+            task.wait(diamondWait)
+        else
+            break
+        end
     end
 end
 
--- Toggle
+-- Toggle Gold
 GoldBtn.MouseButton1Click:Connect(function()
     _G.Config.GoldEnabled = not _G.Config.GoldEnabled
+    
     if _G.Config.GoldEnabled then
         goldIndex = 1
         GoldBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 80)
@@ -215,8 +222,10 @@ GoldBtn.MouseButton1Click:Connect(function()
     end
 end)
 
+-- Toggle Diamond
 DiamondBtn.MouseButton1Click:Connect(function()
     _G.Config.DiamondEnabled = not _G.Config.DiamondEnabled
+    
     if _G.Config.DiamondEnabled then
         diamondIndex = 1
         DiamondBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 80)
@@ -228,9 +237,10 @@ DiamondBtn.MouseButton1Click:Connect(function()
     end
 end)
 
+-- Mở menu
 ToggleBtn.MouseButton1Click:Connect(function() 
     MainFrame.Visible = not MainFrame.Visible 
     if MainFrame.Visible then ShowMenu("Main") end
 end)
 
-print("✅ HAAXSOHAI HUB loaded - Pet Egg Menu đã nhỏ gọn hơn")
+print("✅ HAAXSOHAI HUB loaded - Kiểu hoàn thành vòng rồi mới dừng")
