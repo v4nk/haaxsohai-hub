@@ -44,6 +44,10 @@ local diamondWait = 900
 local goldIndex = 1
 local diamondIndex = 1
 
+-- Biến kiểm soát loop (để tránh lặp nhiều lần)
+local goldLoopRunning = false
+local diamondLoopRunning = false
+
 -- [[ UI ]] --
 local ScreenGui = Instance.new("ScreenGui", CoreGui)
 ScreenGui.Name = "HaaxsohaiHub"
@@ -90,9 +94,7 @@ CreditLabel.Font = Enum.Font.SourceSansItalic
 CreditLabel.TextSize = 12
 CreditLabel.TextTransparency = 0.4
 
-local function Resize(w, h) 
-    MainFrame.Size = UDim2.new(0, w, 0, h) 
-end
+local function Resize(w, h) MainFrame.Size = UDim2.new(0, w, 0, h) end
 
 local Menus = {}
 local function CreateFrame(name)
@@ -116,15 +118,6 @@ local MainM = CreateFrame("Main")
 local FarmM = CreateFrame("Farm")
 local EggM  = CreateFrame("Egg")
 
--- Grid cho Egg Menu: 3 cột
-local function ApplyEggGrid(p)
-    local g = Instance.new("UIGridLayout", p)
-    g.CellSize = UDim2.new(0, 82, 0, 48)      -- Nhỏ, vừa 3 cột
-    g.CellPadding = UDim2.new(0, 10, 0, 12)
-    g.HorizontalAlignment = Enum.HorizontalAlignment.Center
-    g.SortOrder = Enum.SortOrder.LayoutOrder
-end
-
 local function ApplyGrid(p, x, y)
     local g = Instance.new("UIGridLayout", p)
     g.CellSize = UDim2.new(0, x, 0, y)
@@ -134,12 +127,12 @@ end
 
 ApplyGrid(MainM, 120, 38)
 ApplyGrid(FarmM, 110, 35)
-ApplyEggGrid(EggM)   -- ← Grid 3 cột cho Pet Egg
+ApplyGrid(EggM, 85, 48)   -- 3 cột cho Egg
 
 local function MakeButton(parent, label, clr, cb)
     local b = Instance.new("TextButton", parent)
     b.Font = Enum.Font.SourceSansBold
-    b.TextSize = 12.5
+    b.TextSize = 13
     b.TextColor3 = Color3.new(1,1,1)
     b.BackgroundColor3 = clr or Color3.fromRGB(35, 35, 35)
     b.Text = label
@@ -161,7 +154,7 @@ local GoldBtn = MakeButton(FarmM, "GOLD FARM : OFF", Color3.fromRGB(200, 40, 40)
 local DiamondBtn = MakeButton(FarmM, "DIAMOND FARM : OFF", Color3.fromRGB(200, 40, 40))
 MakeButton(FarmM, "BACK", Color3.fromRGB(120, 30, 30), function() ShowMenu("Main") end)
 
--- ================== PET EGG MENU (3 CỘT) ==================
+-- ================== PET EGG MENU ==================
 local function teleportTo(pos)
     local char = LP.Character
     if char and char:FindFirstChild("HumanoidRootPart") then
@@ -175,9 +168,10 @@ MakeButton(EggM, "EGG PARTY", Color3.fromRGB(255, 100, 200), function() teleport
 MakeButton(EggM, "EGG HACKER", Color3.fromRGB(0, 200, 100), function() teleportTo(eggPositions.Hacker) end)
 MakeButton(EggM, "BACK", Color3.fromRGB(120, 30, 30), function() ShowMenu("Main") end)
 
--- ================== GOLD & DIAMOND LOOP ==================
+-- ================== GOLD LOOP ==================
 local function goldLoop()
-    while _G.Config.GoldEnabled do
+    goldLoopRunning = true
+    while _G.Config.GoldEnabled and goldLoopRunning do
         for i = 1, #goldWaypoints do
             if not _G.Config.GoldEnabled then break end
             teleportTo(goldWaypoints[goldIndex])
@@ -187,10 +181,13 @@ local function goldLoop()
         end
         if _G.Config.GoldEnabled then task.wait(goldWait) end
     end
+    goldLoopRunning = false
 end
 
+-- ================== DIAMOND LOOP ==================
 local function diamondLoop()
-    while _G.Config.DiamondEnabled do
+    diamondLoopRunning = true
+    while _G.Config.DiamondEnabled and diamondLoopRunning do
         for i = 1, #diamondWaypoints do
             if not _G.Config.DiamondEnabled then break end
             teleportTo(diamondWaypoints[diamondIndex])
@@ -200,38 +197,47 @@ local function diamondLoop()
         end
         if _G.Config.DiamondEnabled then task.wait(diamondWait) end
     end
+    diamondLoopRunning = false
 end
 
--- Toggle
+-- ================== TOGGLE GOLD ==================
 GoldBtn.MouseButton1Click:Connect(function()
     _G.Config.GoldEnabled = not _G.Config.GoldEnabled
+    
     if _G.Config.GoldEnabled then
         goldIndex = 1
         GoldBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 80)
         GoldBtn.Text = "GOLD FARM : ON"
-        spawn(goldLoop)
+        if not goldLoopRunning then
+            spawn(goldLoop)
+        end
     else
         GoldBtn.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
         GoldBtn.Text = "GOLD FARM : OFF"
     end
 end)
 
+-- ================== TOGGLE DIAMOND ==================
 DiamondBtn.MouseButton1Click:Connect(function()
     _G.Config.DiamondEnabled = not _G.Config.DiamondEnabled
+    
     if _G.Config.DiamondEnabled then
         diamondIndex = 1
         DiamondBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 80)
         DiamondBtn.Text = "DIAMOND FARM : ON"
-        spawn(diamondLoop)
+        if not diamondLoopRunning then
+            spawn(diamondLoop)
+        end
     else
         DiamondBtn.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
         DiamondBtn.Text = "DIAMOND FARM : OFF"
     end
 end)
 
+-- Mở menu
 ToggleBtn.MouseButton1Click:Connect(function() 
     MainFrame.Visible = not MainFrame.Visible 
     if MainFrame.Visible then ShowMenu("Main") end
 end)
 
-print("✅ HAAXSOHAI HUB loaded - Pet Egg Menu 3 cột")
+print("✅ HAAXSOHAI HUB loaded - Đã fix lỗi lặp loop khi bật tắt nhanh")
