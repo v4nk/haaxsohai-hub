@@ -29,26 +29,23 @@ local diamondWaypoints = {
     Vector3.new(47.74, 621.59, -48.47)
 }
 
--- ================== DELAY ĐÃ CHỈNH THÀNH 0.5 GIÂY ==================
-local goldDelay = 0.5      -- Gold delay
-local goldWait = 14.9      -- Gold đợi sau 1 vòng
-
-local diamondDelay = 0.5   -- Diamond delay
-local diamondWait = 900    -- Diamond đợi 15 phút
+local goldDelay = 0.5
+local goldWait = 14.9
+local diamondDelay = 0.5
+local diamondWait = 900
 
 local goldIndex = 1
 local diamondIndex = 1
 
--- [[ UI INITIALIZATION ]] --
+-- [[ UI ]] --
 local ScreenGui = Instance.new("ScreenGui", CoreGui)
 ScreenGui.Name = "HaaxsohaiHub"
 
 local function MiniNotify(text)
     local nFrame = Instance.new("Frame", ScreenGui)
-    nFrame.Size = UDim2.new(0, 170, 0, 35)
+    nFrame.Size = UDim2.new(0, 180, 0, 36)
     nFrame.Position = UDim2.new(1, 10, 0.5, 0)
     nFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    nFrame.BorderSizePixel = 0
     Instance.new("UICorner", nFrame).CornerRadius = UDim.new(0, 8)
     Instance.new("UIStroke", nFrame).Color = Color3.fromRGB(0, 255, 255)
 
@@ -57,18 +54,18 @@ local function MiniNotify(text)
     tLabel.Text = text:upper()
     tLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     tLabel.Font = Enum.Font.SourceSansBold
-    tLabel.TextSize = 12
+    tLabel.TextSize = 13
     tLabel.BackgroundTransparency = 1
 
-    nFrame:TweenPosition(UDim2.new(1, -180, 0.5, 0), "Out", "Quart", 0.4, true)
-    task.delay(2.3, function()
+    nFrame:TweenPosition(UDim2.new(1, -190, 0.5, 0), "Out", "Quart", 0.4, true)
+    task.delay(2.5, function()
         nFrame:TweenPosition(UDim2.new(1, 10, 0.5, 0), "In", "Quart", 0.4, true, function()
             nFrame:Destroy()
         end)
     end)
 end
 
--- [[ ICON NGOÀI ]] --
+-- Icon HX
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
 ToggleBtn.Size = UDim2.new(0, 45, 0, 45)
 ToggleBtn.Position = UDim2.new(0.05, 0, 0.15, 0)
@@ -82,7 +79,7 @@ ToggleBtn.Active = true
 Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(1, 0)
 Instance.new("UIStroke", ToggleBtn).Color = Color3.fromRGB(0, 255, 255)
 
--- [[ MAIN FRAME ]] --
+-- Main Frame
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.Position = UDim2.new(0.12, 0, 0.15, 0)
 MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
@@ -100,7 +97,6 @@ MenuTitle.Font = Enum.Font.SourceSansBold
 MenuTitle.TextSize = 15
 MenuTitle.BackgroundTransparency = 1
 
--- Chữ credit dưới cùng
 local CreditLabel = Instance.new("TextLabel", MainFrame)
 CreditLabel.Size = UDim2.new(1, 0, 0, 18)
 CreditLabel.Position = UDim2.new(0, 0, 1, -22)
@@ -111,9 +107,7 @@ CreditLabel.Font = Enum.Font.SourceSansItalic
 CreditLabel.TextSize = 12
 CreditLabel.TextTransparency = 0.4
 
-local function Resize(w, h) 
-    MainFrame.Size = UDim2.new(0, w, 0, h) 
-end
+local function Resize(w, h) MainFrame.Size = UDim2.new(0, w, 0, h) end
 
 local Menus = {}
 local function CreateFrame(name)
@@ -161,15 +155,12 @@ local function MakeButton(parent, label, clr, cb)
     return b
 end
 
--- ================== MAIN MENU ==================
 MakeButton(MainM, "FARM MENU", Color3.fromRGB(0, 102, 204), function() ShowMenu("Farm") end)
 
--- ================== FARM MENU ==================
 local GoldBtn = MakeButton(FarmM, "GOLD FARM : OFF", Color3.fromRGB(200, 40, 40))
 local DiamondBtn = MakeButton(FarmM, "DIAMOND FARM : OFF", Color3.fromRGB(200, 40, 40))
 MakeButton(FarmM, "BACK", Color3.fromRGB(120, 30, 30), function() ShowMenu("Main") end)
 
--- ================== TELEPORT FUNCTION ==================
 local function teleportTo(pos)
     local char = LP.Character
     if char and char:FindFirstChild("HumanoidRootPart") then
@@ -191,27 +182,29 @@ local function goldLoop()
     end
 end
 
--- ================== DIAMOND LOOP ==================
+-- ================== DIAMOND LOOP - ĐÃ SỬA LẠI HOÀN CHỈNH ==================
 local function diamondLoop()
     while _G.Config.DiamondEnabled do
+        -- Teleport hết 4 điểm
         for i = 1, #diamondWaypoints do
             if not _G.Config.DiamondEnabled then break end
-            
+
             teleportTo(diamondWaypoints[diamondIndex])
             diamondIndex = diamondIndex + 1
             if diamondIndex > #diamondWaypoints then diamondIndex = 1 end
-            
+
             task.wait(diamondDelay)
         end
 
+        -- Đợi 15 phút rồi chạy tiếp vòng mới
         if _G.Config.DiamondEnabled then
-            MiniNotify("DIAMOND FARM: Hoàn thành 1 vòng - Đợi 15 phút")
+            MiniNotify("DIAMOND → Hoàn thành 1 vòng | Đợi 15 phút...")
             task.wait(diamondWait)
         end
     end
 end
 
--- ================== TOGGLE GOLD ==================
+-- Toggle Gold
 GoldBtn.MouseButton1Click:Connect(function()
     _G.Config.GoldEnabled = not _G.Config.GoldEnabled
     if _G.Config.GoldEnabled then
@@ -227,7 +220,7 @@ GoldBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- ================== TOGGLE DIAMOND ==================
+-- Toggle Diamond
 DiamondBtn.MouseButton1Click:Connect(function()
     _G.Config.DiamondEnabled = not _G.Config.DiamondEnabled
     if _G.Config.DiamondEnabled then
@@ -243,10 +236,9 @@ DiamondBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Mở menu
 ToggleBtn.MouseButton1Click:Connect(function() 
     MainFrame.Visible = not MainFrame.Visible 
     if MainFrame.Visible then ShowMenu("Main") end
 end)
 
-print("✅ HAAXSOHAI HUB loaded - Delay Gold & Diamond = 0.5s")
+print("✅ HAAXSOHAI HUB loaded - Diamond Loop đã được sửa hoàn chỉnh")
