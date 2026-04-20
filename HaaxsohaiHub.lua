@@ -36,19 +36,19 @@ local eggPositions = {
     Hacker = Vector3.new(-13.76, 503.69, 76.01)
 }
 
-local goldDelay = 0.3
+local goldDelay = 0.1
 local goldWait = 15
-local diamondDelay = 0.3
+local diamondDelay = 0.1
 local diamondWait = 910
 
 local goldIndex = 1
 local diamondIndex = 1
 
--- [[ UI INITIALIZATION ]] --
+-- [[ UI ]] --
 local ScreenGui = Instance.new("ScreenGui", CoreGui)
 ScreenGui.Name = "HaaxsohaiHub"
 
--- [[ ICON NGOÀI ]] --
+-- Icon ngoài
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
 ToggleBtn.Size = UDim2.new(0, 45, 0, 45)
 ToggleBtn.Position = UDim2.new(0.05, 0, 0.15, 0)
@@ -62,7 +62,7 @@ ToggleBtn.Active = true
 Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(1, 0)
 Instance.new("UIStroke", ToggleBtn).Color = Color3.fromRGB(0, 255, 255)
 
--- [[ MAIN FRAME ]] --
+-- Main Frame
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.Position = UDim2.new(0.12, 0, 0.15, 0)
 MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
@@ -80,7 +80,6 @@ MenuTitle.Font = Enum.Font.SourceSansBold
 MenuTitle.TextSize = 15
 MenuTitle.BackgroundTransparency = 1
 
--- Chữ credit dưới cùng
 local CreditLabel = Instance.new("TextLabel", MainFrame)
 CreditLabel.Size = UDim2.new(1, 0, 0, 18)
 CreditLabel.Position = UDim2.new(0, 0, 1, -22)
@@ -110,12 +109,21 @@ local function ShowMenu(name)
     for k, v in pairs(Menus) do v.Visible = (k == name) end
     if name == "Main" then Resize(280, 190)
     elseif name == "Farm" then Resize(280, 195)
-    elseif name == "Egg" then Resize(280, 230) end
+    elseif name == "Egg" then Resize(280, 250) end   -- Tăng chiều cao cho menu Egg 3 cột
 end
 
 local MainM = CreateFrame("Main")
 local FarmM = CreateFrame("Farm")
 local EggM  = CreateFrame("Egg")
+
+-- Grid cho Egg Menu: 3 cột
+local function ApplyEggGrid(p)
+    local g = Instance.new("UIGridLayout", p)
+    g.CellSize = UDim2.new(0, 85, 0, 48)      -- Nút nhỏ, vừa 3 cột
+    g.CellPadding = UDim2.new(0, 8, 0, 12)
+    g.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    g.SortOrder = Enum.SortOrder.LayoutOrder
+end
 
 local function ApplyGrid(p, x, y)
     local g = Instance.new("UIGridLayout", p)
@@ -126,12 +134,12 @@ end
 
 ApplyGrid(MainM, 120, 38)
 ApplyGrid(FarmM, 110, 35)
-ApplyGrid(EggM,  240, 45)
+ApplyEggGrid(EggM)   -- Grid 3 cột cho Pet Egg
 
 local function MakeButton(parent, label, clr, cb)
     local b = Instance.new("TextButton", parent)
     b.Font = Enum.Font.SourceSansBold
-    b.TextSize = 13
+    b.TextSize = 12.5
     b.TextColor3 = Color3.new(1,1,1)
     b.BackgroundColor3 = clr or Color3.fromRGB(35, 35, 35)
     b.Text = label
@@ -153,7 +161,7 @@ local GoldBtn = MakeButton(FarmM, "GOLD FARM : OFF", Color3.fromRGB(200, 40, 40)
 local DiamondBtn = MakeButton(FarmM, "DIAMOND FARM : OFF", Color3.fromRGB(200, 40, 40))
 MakeButton(FarmM, "BACK", Color3.fromRGB(120, 30, 30), function() ShowMenu("Main") end)
 
--- ================== PET EGG MENU ==================
+-- ================== PET EGG MENU (3 CỘT) ==================
 local function teleportTo(pos)
     local char = LP.Character
     if char and char:FindFirstChild("HumanoidRootPart") then
@@ -190,13 +198,11 @@ local function diamondLoop()
             if diamondIndex > #diamondWaypoints then diamondIndex = 1 end
             task.wait(diamondDelay)
         end
-        if _G.Config.DiamondEnabled then
-            task.wait(diamondWait)
-        end
+        if _G.Config.DiamondEnabled then task.wait(diamondWait) end
     end
 end
 
--- Toggle Gold
+-- Toggle
 GoldBtn.MouseButton1Click:Connect(function()
     _G.Config.GoldEnabled = not _G.Config.GoldEnabled
     if _G.Config.GoldEnabled then
@@ -210,7 +216,6 @@ GoldBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Toggle Diamond
 DiamondBtn.MouseButton1Click:Connect(function()
     _G.Config.DiamondEnabled = not _G.Config.DiamondEnabled
     if _G.Config.DiamondEnabled then
@@ -224,10 +229,9 @@ DiamondBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Mở menu
 ToggleBtn.MouseButton1Click:Connect(function() 
     MainFrame.Visible = not MainFrame.Visible 
     if MainFrame.Visible then ShowMenu("Main") end
 end)
 
-print("✅ HAAXSOHAI HUB loaded - Đã xóa hoàn toàn thông báo")
+print("✅ HAAXSOHAI HUB loaded - Pet Egg Menu đã sắp xếp 3 cột")
