@@ -37,7 +37,15 @@ local diamondWait = 900
 local goldIndex = 1
 local diamondIndex = 1
 
--- [[ UI ]] --
+-- [[ EGG POSITIONS ]] --
+local eggPositions = {
+    Noob  = Vector3.new(43.76, 1.70, -17.58),
+    Bacon = Vector3.new(43.26, 1.70, -1.28),
+    Party = Vector3.new(43.65, 1.70, 14.96),
+    Hacker = Vector3.new(-13.76, 503.69, 76.01)
+}
+
+-- [[ UI INITIALIZATION ]] --
 local ScreenGui = Instance.new("ScreenGui", CoreGui)
 ScreenGui.Name = "HaaxsohaiHub"
 
@@ -58,14 +66,14 @@ local function MiniNotify(text)
     tLabel.BackgroundTransparency = 1
 
     nFrame:TweenPosition(UDim2.new(1, -190, 0.5, 0), "Out", "Quart", 0.4, true)
-    task.delay(2.5, function()
+    task.delay(2.3, function()
         nFrame:TweenPosition(UDim2.new(1, 10, 0.5, 0), "In", "Quart", 0.4, true, function()
             nFrame:Destroy()
         end)
     end)
 end
 
--- Icon HX
+-- [[ ICON NGOÀI ]] --
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
 ToggleBtn.Size = UDim2.new(0, 45, 0, 45)
 ToggleBtn.Position = UDim2.new(0.05, 0, 0.15, 0)
@@ -79,7 +87,7 @@ ToggleBtn.Active = true
 Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(1, 0)
 Instance.new("UIStroke", ToggleBtn).Color = Color3.fromRGB(0, 255, 255)
 
--- Main Frame
+-- [[ MAIN FRAME ]] --
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.Position = UDim2.new(0.12, 0, 0.15, 0)
 MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
@@ -122,12 +130,14 @@ end
 
 local function ShowMenu(name)
     for k, v in pairs(Menus) do v.Visible = (k == name) end
-    if name == "Main" then Resize(260, 165)
-    elseif name == "Farm" then Resize(260, 195) end
+    if name == "Main" then Resize(280, 190)
+    elseif name == "Farm" then Resize(280, 195)
+    elseif name == "Egg" then Resize(280, 230) end
 end
 
 local MainM = CreateFrame("Main")
 local FarmM = CreateFrame("Farm")
+local EggM  = CreateFrame("Egg")   -- Menu Pet Egg mới
 
 local function ApplyGrid(p, x, y)
     local g = Instance.new("UIGridLayout", p)
@@ -136,8 +146,9 @@ local function ApplyGrid(p, x, y)
     g.HorizontalAlignment = Enum.HorizontalAlignment.Center
 end
 
-ApplyGrid(MainM, 110, 35)
+ApplyGrid(MainM, 120, 38)
 ApplyGrid(FarmM, 110, 35)
+ApplyGrid(EggM,  240, 45)
 
 local function MakeButton(parent, label, clr, cb)
     local b = Instance.new("TextButton", parent)
@@ -155,20 +166,43 @@ local function MakeButton(parent, label, clr, cb)
     return b
 end
 
+-- ================== MAIN MENU ==================
 MakeButton(MainM, "FARM MENU", Color3.fromRGB(0, 102, 204), function() ShowMenu("Farm") end)
+MakeButton(MainM, "PET EGG", Color3.fromRGB(255, 140, 0), function() ShowMenu("Egg") end)   -- Nút mới
 
+-- ================== FARM MENU ==================
 local GoldBtn = MakeButton(FarmM, "GOLD FARM : OFF", Color3.fromRGB(200, 40, 40))
 local DiamondBtn = MakeButton(FarmM, "DIAMOND FARM : OFF", Color3.fromRGB(200, 40, 40))
 MakeButton(FarmM, "BACK", Color3.fromRGB(120, 30, 30), function() ShowMenu("Main") end)
 
+-- ================== PET EGG MENU ==================
 local function teleportTo(pos)
     local char = LP.Character
     if char and char:FindFirstChild("HumanoidRootPart") then
         char.HumanoidRootPart.CFrame = CFrame.new(pos.X, pos.Y + 4, pos.Z)
+        MiniNotify("Teleported to Egg")
     end
 end
 
--- ================== GOLD LOOP ==================
+MakeButton(EggM, "EGG NOOB", Color3.fromRGB(100, 100, 100), function()
+    teleportTo(eggPositions.Noob)
+end)
+
+MakeButton(EggM, "EGG BACON", Color3.fromRGB(180, 100, 50), function()
+    teleportTo(eggPositions.Bacon)
+end)
+
+MakeButton(EggM, "EGG PARTY", Color3.fromRGB(255, 100, 200), function()
+    teleportTo(eggPositions.Party)
+end)
+
+MakeButton(EggM, "EGG HACKER", Color3.fromRGB(0, 200, 100), function()
+    teleportTo(eggPositions.Hacker)
+end)
+
+MakeButton(EggM, "BACK", Color3.fromRGB(120, 30, 30), function() ShowMenu("Main") end)
+
+-- ================== GOLD & DIAMOND LOOP (giữ nguyên) ==================
 local function goldLoop()
     while _G.Config.GoldEnabled do
         for i = 1, #goldWaypoints do
@@ -182,29 +216,23 @@ local function goldLoop()
     end
 end
 
--- ================== DIAMOND LOOP - ĐÃ SỬA LẠI HOÀN CHỈNH ==================
 local function diamondLoop()
     while _G.Config.DiamondEnabled do
-        -- Teleport hết 4 điểm
         for i = 1, #diamondWaypoints do
             if not _G.Config.DiamondEnabled then break end
-
             teleportTo(diamondWaypoints[diamondIndex])
             diamondIndex = diamondIndex + 1
             if diamondIndex > #diamondWaypoints then diamondIndex = 1 end
-
             task.wait(diamondDelay)
         end
-
-        -- Đợi 15 phút rồi chạy tiếp vòng mới
         if _G.Config.DiamondEnabled then
-            MiniNotify("DIAMOND → Hoàn thành 1 vòng | Đợi 15 phút...")
+            MiniNotify("DIAMOND FARM: Hoàn thành 1 vòng - Đợi 15 phút")
             task.wait(diamondWait)
         end
     end
 end
 
--- Toggle Gold
+-- Toggle Gold & Diamond (giữ nguyên)
 GoldBtn.MouseButton1Click:Connect(function()
     _G.Config.GoldEnabled = not _G.Config.GoldEnabled
     if _G.Config.GoldEnabled then
@@ -220,7 +248,6 @@ GoldBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Toggle Diamond
 DiamondBtn.MouseButton1Click:Connect(function()
     _G.Config.DiamondEnabled = not _G.Config.DiamondEnabled
     if _G.Config.DiamondEnabled then
@@ -236,9 +263,10 @@ DiamondBtn.MouseButton1Click:Connect(function()
     end
 end)
 
+-- Mở menu
 ToggleBtn.MouseButton1Click:Connect(function() 
     MainFrame.Visible = not MainFrame.Visible 
     if MainFrame.Visible then ShowMenu("Main") end
 end)
 
-print("✅ HAAXSOHAI HUB loaded - Diamond Loop đã được sửa hoàn chỉnh")
+print("✅ HAAXSOHAI HUB loaded - Đã thêm chức năng Pet Egg!")
