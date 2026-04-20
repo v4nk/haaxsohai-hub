@@ -29,10 +29,10 @@ local diamondWaypoints = {
     Vector3.new(47.74, 621.59, -48.47)
 }
 
-local goldDelay = 0.25
+local goldDelay = 0.1
 local goldWait = 15
-local diamondDelay = 0.25
-local diamondWait = 900
+local diamondDelay = 0.1
+local diamondWait = 904
 
 local goldIndex = 1
 local diamondIndex = 1
