@@ -36,10 +36,10 @@ local eggPositions = {
     Hacker = Vector3.new(-13.76, 503.69, 76.01)
 }
 
-local goldDelay = 0.5
-local goldWait = 14.9
-local diamondDelay = 0.5
-local diamondWait = 900
+local goldDelay = 0.25
+local goldWait = 15
+local diamondDelay = 0.25
+local diamondWait = 910
 
 local goldIndex = 1
 local diamondIndex = 1
