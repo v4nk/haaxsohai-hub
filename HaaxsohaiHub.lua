@@ -1,6 +1,5 @@
 -- [[ SYSTEM & SERVICES ]] --
 local RunService = game:GetService("RunService")
-local UIS = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
 
@@ -36,23 +35,22 @@ local eggPositions = {
     Hacker = Vector3.new(-13.76, 503.69, 76.01)
 }
 
-local goldDelay = 0.5
-local goldWait = 14.9
-local diamondDelay = 0.5
-local diamondWait = 900
+local goldDelay = 0.25
+local goldWait = 15
+local diamondDelay = 0.25
+local diamondWait = 905
 
 local goldIndex = 1
 local diamondIndex = 1
 
--- Biáº¿n kiá»m soÃ¡t loop (Äá» trÃ¡nh láº·p nhiá»u láº§n)
-local goldLoopRunning = false
-local diamondLoopRunning = false
+-- Biến kiểm soát mạnh
+local goldThread = nil
+local diamondThread = nil
 
 -- [[ UI ]] --
 local ScreenGui = Instance.new("ScreenGui", CoreGui)
 ScreenGui.Name = "HaaxsohaiHub"
 
--- Icon ngoÃ i
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
 ToggleBtn.Size = UDim2.new(0, 45, 0, 45)
 ToggleBtn.Position = UDim2.new(0.05, 0, 0.15, 0)
@@ -66,7 +64,6 @@ ToggleBtn.Active = true
 Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(1, 0)
 Instance.new("UIStroke", ToggleBtn).Color = Color3.fromRGB(0, 255, 255)
 
--- Main Frame
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.Position = UDim2.new(0.12, 0, 0.15, 0)
 MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
@@ -111,7 +108,7 @@ local function ShowMenu(name)
     for k, v in pairs(Menus) do v.Visible = (k == name) end
     if name == "Main" then Resize(280, 190)
     elseif name == "Farm" then Resize(280, 195)
-    elseif name == "Egg" then Resize(280, 230) end
+    elseif name == "Egg" then Resize(280, 200) end
 end
 
 local MainM = CreateFrame("Main")
@@ -127,7 +124,7 @@ end
 
 ApplyGrid(MainM, 120, 38)
 ApplyGrid(FarmM, 110, 35)
-ApplyGrid(EggM, 85, 48)   -- 3 cá»t cho Egg
+ApplyGrid(EggM, 85, 40)
 
 local function MakeButton(parent, label, clr, cb)
     local b = Instance.new("TextButton", parent)
@@ -145,16 +142,16 @@ local function MakeButton(parent, label, clr, cb)
     return b
 end
 
--- ================== MAIN MENU ==================
+-- Main Menu
 MakeButton(MainM, "FARM MENU", Color3.fromRGB(0, 102, 204), function() ShowMenu("Farm") end)
 MakeButton(MainM, "PET EGG", Color3.fromRGB(255, 140, 0), function() ShowMenu("Egg") end)
 
--- ================== FARM MENU ==================
+-- Farm Menu
 local GoldBtn = MakeButton(FarmM, "GOLD FARM : OFF", Color3.fromRGB(200, 40, 40))
 local DiamondBtn = MakeButton(FarmM, "DIAMOND FARM : OFF", Color3.fromRGB(200, 40, 40))
 MakeButton(FarmM, "BACK", Color3.fromRGB(120, 30, 30), function() ShowMenu("Main") end)
 
--- ================== PET EGG MENU ==================
+-- Pet Egg Menu
 local function teleportTo(pos)
     local char = LP.Character
     if char and char:FindFirstChild("HumanoidRootPart") then
@@ -170,8 +167,7 @@ MakeButton(EggM, "BACK", Color3.fromRGB(120, 30, 30), function() ShowMenu("Main"
 
 -- ================== GOLD LOOP ==================
 local function goldLoop()
-    goldLoopRunning = true
-    while _G.Config.GoldEnabled and goldLoopRunning do
+    while _G.Config.GoldEnabled do
         for i = 1, #goldWaypoints do
             if not _G.Config.GoldEnabled then break end
             teleportTo(goldWaypoints[goldIndex])
@@ -179,15 +175,17 @@ local function goldLoop()
             if goldIndex > #goldWaypoints then goldIndex = 1 end
             task.wait(goldDelay)
         end
-        if _G.Config.GoldEnabled then task.wait(goldWait) end
+        if _G.Config.GoldEnabled then
+            task.wait(goldWait)
+        else
+            break
+        end
     end
-    goldLoopRunning = false
 end
 
 -- ================== DIAMOND LOOP ==================
 local function diamondLoop()
-    diamondLoopRunning = true
-    while _G.Config.DiamondEnabled and diamondLoopRunning do
+    while _G.Config.DiamondEnabled do
         for i = 1, #diamondWaypoints do
             if not _G.Config.DiamondEnabled then break end
             teleportTo(diamondWaypoints[diamondIndex])
@@ -195,49 +193,71 @@ local function diamondLoop()
             if diamondIndex > #diamondWaypoints then diamondIndex = 1 end
             task.wait(diamondDelay)
         end
-        if _G.Config.DiamondEnabled then task.wait(diamondWait) end
+        if _G.Config.DiamondEnabled then
+            task.wait(diamondWait)
+        else
+            break
+        end
     end
-    diamondLoopRunning = false
 end
 
--- ================== TOGGLE GOLD ==================
+-- ================== TOGGLE GOLD (Phiên bản mạnh) ==================
 GoldBtn.MouseButton1Click:Connect(function()
     _G.Config.GoldEnabled = not _G.Config.GoldEnabled
-    
+
     if _G.Config.GoldEnabled then
         goldIndex = 1
         GoldBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 80)
         GoldBtn.Text = "GOLD FARM : ON"
-        if not goldLoopRunning then
-            spawn(goldLoop)
+        
+        -- Dừng thread cũ nếu có
+        if goldThread then 
+            pcall(function() coroutine.close(goldThread) end) 
         end
+        
+        goldThread = coroutine.create(goldLoop)
+        coroutine.resume(goldThread)
     else
         GoldBtn.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
         GoldBtn.Text = "GOLD FARM : OFF"
+        
+        if goldThread then 
+            pcall(function() coroutine.close(goldThread) end) 
+            goldThread = nil 
+        end
     end
 end)
 
--- ================== TOGGLE DIAMOND ==================
+-- ================== TOGGLE DIAMOND (Phiên bản mạnh) ==================
 DiamondBtn.MouseButton1Click:Connect(function()
     _G.Config.DiamondEnabled = not _G.Config.DiamondEnabled
-    
+
     if _G.Config.DiamondEnabled then
         diamondIndex = 1
         DiamondBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 80)
         DiamondBtn.Text = "DIAMOND FARM : ON"
-        if not diamondLoopRunning then
-            spawn(diamondLoop)
+        
+        if diamondThread then 
+            pcall(function() coroutine.close(diamondThread) end) 
         end
+        
+        diamondThread = coroutine.create(diamondLoop)
+        coroutine.resume(diamondThread)
     else
         DiamondBtn.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
         DiamondBtn.Text = "DIAMOND FARM : OFF"
+        
+        if diamondThread then 
+            pcall(function() coroutine.close(diamondThread) end) 
+            diamondThread = nil 
+        end
     end
 end)
 
--- Má» menu
+-- Mở menu
 ToggleBtn.MouseButton1Click:Connect(function() 
     MainFrame.Visible = not MainFrame.Visible 
     if MainFrame.Visible then ShowMenu("Main") end
 end)
 
-print("â HAAXSOHAI HUB loaded - ÄÃ£ fix lá»i láº·p loop khi báº­t táº¯t nhanh")
+print("✅ HAAXSOHAI HUB loaded - Fix mạnh lỗi tele loạn khi ấn nhiều lần")
