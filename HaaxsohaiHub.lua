@@ -36,10 +36,10 @@ local eggPositions = {
     Hacker = Vector3.new(-13.76, 503.69, 76.01)
 }
 
-local goldDelay = 0.1
-local goldWait = 15
-local diamondDelay = 0.1
-local diamondWait = 910
+local goldDelay = 0.5
+local goldWait = 14.9
+local diamondDelay = 0.5
+local diamondWait = 900
 
 local goldIndex = 1
 local diamondIndex = 1
@@ -109,7 +109,7 @@ local function ShowMenu(name)
     for k, v in pairs(Menus) do v.Visible = (k == name) end
     if name == "Main" then Resize(280, 190)
     elseif name == "Farm" then Resize(280, 195)
-    elseif name == "Egg" then Resize(280, 250) end   -- Tăng chiều cao cho menu Egg 3 cột
+    elseif name == "Egg" then Resize(280, 230) end
 end
 
 local MainM = CreateFrame("Main")
@@ -119,8 +119,8 @@ local EggM  = CreateFrame("Egg")
 -- Grid cho Egg Menu: 3 cột
 local function ApplyEggGrid(p)
     local g = Instance.new("UIGridLayout", p)
-    g.CellSize = UDim2.new(0, 85, 0, 48)      -- Nút nhỏ, vừa 3 cột
-    g.CellPadding = UDim2.new(0, 8, 0, 12)
+    g.CellSize = UDim2.new(0, 82, 0, 48)      -- Nhỏ, vừa 3 cột
+    g.CellPadding = UDim2.new(0, 10, 0, 12)
     g.HorizontalAlignment = Enum.HorizontalAlignment.Center
     g.SortOrder = Enum.SortOrder.LayoutOrder
 end
@@ -134,7 +134,7 @@ end
 
 ApplyGrid(MainM, 120, 38)
 ApplyGrid(FarmM, 110, 35)
-ApplyEggGrid(EggM)   -- Grid 3 cột cho Pet Egg
+ApplyEggGrid(EggM)   -- ← Grid 3 cột cho Pet Egg
 
 local function MakeButton(parent, label, clr, cb)
     local b = Instance.new("TextButton", parent)
@@ -234,4 +234,4 @@ ToggleBtn.MouseButton1Click:Connect(function()
     if MainFrame.Visible then ShowMenu("Main") end
 end)
 
-print("✅ HAAXSOHAI HUB loaded - Pet Egg Menu đã sắp xếp 3 cột")
+print("✅ HAAXSOHAI HUB loaded - Pet Egg Menu 3 cột")
