@@ -44,6 +44,10 @@ local diamondWait = 900
 local goldIndex = 1
 local diamondIndex = 1
 
+-- Biến kiểm soát loop (để tránh lặp nhiều lần)
+local goldLoopRunning = false
+local diamondLoopRunning = false
+
 -- [[ UI ]] --
 local ScreenGui = Instance.new("ScreenGui", CoreGui)
 ScreenGui.Name = "HaaxsohaiHub"
@@ -80,33 +84,6 @@ MenuTitle.Font = Enum.Font.SourceSansBold
 MenuTitle.TextSize = 15
 MenuTitle.BackgroundTransparency = 1
 
--- ================== TIMER AREA (2 cột) ==================
-local TimerFrame = Instance.new("Frame", MainFrame)
-TimerFrame.Size = UDim2.new(1, -20, 0, 50)
-TimerFrame.Position = UDim2.new(0, 10, 1, -75)
-TimerFrame.BackgroundTransparency = 1
-
-local GoldTimerLabel = Instance.new("TextLabel", TimerFrame)
-GoldTimerLabel.Size = UDim2.new(0.5, -5, 1, 0)
-GoldTimerLabel.Position = UDim2.new(0, 0, 0, 0)
-GoldTimerLabel.BackgroundTransparency = 1
-GoldTimerLabel.Text = "Gold: Đang tắt"
-GoldTimerLabel.TextColor3 = Color3.fromRGB(255, 215, 0)
-GoldTimerLabel.Font = Enum.Font.SourceSansBold
-GoldTimerLabel.TextSize = 14
-GoldTimerLabel.TextXAlignment = Enum.TextXAlignment.Left
-
-local DiamondTimerLabel = Instance.new("TextLabel", TimerFrame)
-DiamondTimerLabel.Size = UDim2.new(0.5, -5, 1, 0)
-DiamondTimerLabel.Position = UDim2.new(0.5, 5, 0, 0)
-DiamondTimerLabel.BackgroundTransparency = 1
-DiamondTimerLabel.Text = "Diamond: Đang tắt"
-DiamondTimerLabel.TextColor3 = Color3.fromRGB(0, 255, 255)
-DiamondTimerLabel.Font = Enum.Font.SourceSansBold
-DiamondTimerLabel.TextSize = 14
-DiamondTimerLabel.TextXAlignment = Enum.TextXAlignment.Right
-
--- Credit chỉ ở dưới cùng
 local CreditLabel = Instance.new("TextLabel", MainFrame)
 CreditLabel.Size = UDim2.new(1, 0, 0, 18)
 CreditLabel.Position = UDim2.new(0, 0, 1, -22)
@@ -117,14 +94,12 @@ CreditLabel.Font = Enum.Font.SourceSansItalic
 CreditLabel.TextSize = 12
 CreditLabel.TextTransparency = 0.4
 
-local function Resize(w, h) 
-    MainFrame.Size = UDim2.new(0, w, 0, h) 
-end
+local function Resize(w, h) MainFrame.Size = UDim2.new(0, w, 0, h) end
 
 local Menus = {}
 local function CreateFrame(name)
     local f = Instance.new("Frame", MainFrame)
-    f.Size = UDim2.new(1, 0, 1, -95)   -- Giảm chiều cao để dành chỗ cho Timer
+    f.Size = UDim2.new(1, 0, 1, -65)
     f.Position = UDim2.new(0, 0, 0, 45)
     f.BackgroundTransparency = 1
     f.Visible = false
@@ -134,7 +109,7 @@ end
 
 local function ShowMenu(name)
     for k, v in pairs(Menus) do v.Visible = (k == name) end
-    if name == "Main" then Resize(280, 210)
+    if name == "Main" then Resize(280, 190)
     elseif name == "Farm" then Resize(280, 195)
     elseif name == "Egg" then Resize(280, 230) end
 end
@@ -152,7 +127,7 @@ end
 
 ApplyGrid(MainM, 120, 38)
 ApplyGrid(FarmM, 110, 35)
-ApplyGrid(EggM, 85, 48)
+ApplyGrid(EggM, 85, 48)   -- 3 cột cho Egg
 
 local function MakeButton(parent, label, clr, cb)
     local b = Instance.new("TextButton", parent)
@@ -179,7 +154,7 @@ local GoldBtn = MakeButton(FarmM, "GOLD FARM : OFF", Color3.fromRGB(200, 40, 40)
 local DiamondBtn = MakeButton(FarmM, "DIAMOND FARM : OFF", Color3.fromRGB(200, 40, 40))
 MakeButton(FarmM, "BACK", Color3.fromRGB(120, 30, 30), function() ShowMenu("Main") end)
 
--- ================== PET EGG MENU (3 cột) ==================
+-- ================== PET EGG MENU ==================
 local function teleportTo(pos)
     local char = LP.Character
     if char and char:FindFirstChild("HumanoidRootPart") then
@@ -193,9 +168,10 @@ MakeButton(EggM, "EGG PARTY", Color3.fromRGB(255, 100, 200), function() teleport
 MakeButton(EggM, "EGG HACKER", Color3.fromRGB(0, 200, 100), function() teleportTo(eggPositions.Hacker) end)
 MakeButton(EggM, "BACK", Color3.fromRGB(120, 30, 30), function() ShowMenu("Main") end)
 
--- ================== GOLD & DIAMOND LOOP ==================
+-- ================== GOLD LOOP ==================
 local function goldLoop()
-    while _G.Config.GoldEnabled do
+    goldLoopRunning = true
+    while _G.Config.GoldEnabled and goldLoopRunning do
         for i = 1, #goldWaypoints do
             if not _G.Config.GoldEnabled then break end
             teleportTo(goldWaypoints[goldIndex])
@@ -205,10 +181,13 @@ local function goldLoop()
         end
         if _G.Config.GoldEnabled then task.wait(goldWait) end
     end
+    goldLoopRunning = false
 end
 
+-- ================== DIAMOND LOOP ==================
 local function diamondLoop()
-    while _G.Config.DiamondEnabled do
+    diamondLoopRunning = true
+    while _G.Config.DiamondEnabled and diamondLoopRunning do
         for i = 1, #diamondWaypoints do
             if not _G.Config.DiamondEnabled then break end
             teleportTo(diamondWaypoints[diamondIndex])
@@ -218,37 +197,40 @@ local function diamondLoop()
         end
         if _G.Config.DiamondEnabled then task.wait(diamondWait) end
     end
+    diamondLoopRunning = false
 end
 
--- Toggle Gold
+-- ================== TOGGLE GOLD ==================
 GoldBtn.MouseButton1Click:Connect(function()
     _G.Config.GoldEnabled = not _G.Config.GoldEnabled
+    
     if _G.Config.GoldEnabled then
         goldIndex = 1
         GoldBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 80)
         GoldBtn.Text = "GOLD FARM : ON"
-        spawn(goldLoop)
-        GoldTimerLabel.Text = "Gold: Đang chạy..."
+        if not goldLoopRunning then
+            spawn(goldLoop)
+        end
     else
         GoldBtn.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
         GoldBtn.Text = "GOLD FARM : OFF"
-        GoldTimerLabel.Text = "Gold: Đang tắt"
     end
 end)
 
--- Toggle Diamond
+-- ================== TOGGLE DIAMOND ==================
 DiamondBtn.MouseButton1Click:Connect(function()
     _G.Config.DiamondEnabled = not _G.Config.DiamondEnabled
+    
     if _G.Config.DiamondEnabled then
         diamondIndex = 1
         DiamondBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 80)
         DiamondBtn.Text = "DIAMOND FARM : ON"
-        spawn(diamondLoop)
-        DiamondTimerLabel.Text = "Diamond: Đang chạy..."
+        if not diamondLoopRunning then
+            spawn(diamondLoop)
+        end
     else
         DiamondBtn.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
         DiamondBtn.Text = "DIAMOND FARM : OFF"
-        DiamondTimerLabel.Text = "Diamond: Đang tắt"
     end
 end)
 
@@ -258,4 +240,4 @@ ToggleBtn.MouseButton1Click:Connect(function()
     if MainFrame.Visible then ShowMenu("Main") end
 end)
 
-print("✅ HAAXSOHAI HUB loaded - Đã thêm Timer 2 cột")
+print("✅ HAAXSOHAI HUB loaded - Đã fix lỗi lặp loop khi bật tắt nhanh")
