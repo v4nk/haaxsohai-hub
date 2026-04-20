@@ -37,9 +37,9 @@ local eggPositions = {
 }
 
 local goldDelay = 0.5
-local goldWait = 14.9
+local goldWait = 15
 local diamondDelay = 0.5
-local diamondWait = 900
+local diamondWait = 905
 
 local goldIndex = 1
 local diamondIndex = 1
