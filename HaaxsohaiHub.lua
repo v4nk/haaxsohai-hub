@@ -36,10 +36,10 @@ local eggPositions = {
     Hacker = Vector3.new(-13.76, 503.69, 76.01)
 }
 
-local goldDelay = 0.1
-local goldWait = 15
-local diamondDelay = 0.1
-local diamondWait = 905
+local goldDelay = 0.5
+local goldWait = 14.9
+local diamondDelay = 0.5
+local diamondWait = 900
 
 local goldIndex = 1
 local diamondIndex = 1
@@ -109,18 +109,18 @@ local function ShowMenu(name)
     for k, v in pairs(Menus) do v.Visible = (k == name) end
     if name == "Main" then Resize(280, 190)
     elseif name == "Farm" then Resize(280, 195)
-    elseif name == "Egg" then Resize(280, 205) end   -- Giảm chiều cao menu Egg
+    elseif name == "Egg" then Resize(280, 200) end   -- Giảm chiều cao menu Egg
 end
 
 local MainM = CreateFrame("Main")
 local FarmM = CreateFrame("Farm")
 local EggM  = CreateFrame("Egg")
 
--- Grid cho Egg Menu: 3 cột, nút nhỏ gọn
+-- Grid cho Egg Menu: 3 cột, nút nhỏ gọn hơn
 local function ApplyEggGrid(p)
     local g = Instance.new("UIGridLayout", p)
-    g.CellSize = UDim2.new(0, 82, 0, 42)      -- Nhỏ và ngắn hơn
-    g.CellPadding = UDim2.new(0, 10, 0, 10)
+    g.CellSize = UDim2.new(0, 80, 0, 38)      -- Nhỏ và ngắn hơn nữa
+    g.CellPadding = UDim2.new(0, 8, 0, 10)
     g.HorizontalAlignment = Enum.HorizontalAlignment.Center
 end
 
@@ -138,11 +138,11 @@ ApplyEggGrid(EggM)
 local function MakeButton(parent, label, clr, cb)
     local b = Instance.new("TextButton", parent)
     b.Font = Enum.Font.SourceSansBold
-    b.TextSize = 12.5
+    b.TextSize = 12
     b.TextColor3 = Color3.new(1,1,1)
     b.BackgroundColor3 = clr or Color3.fromRGB(35, 35, 35)
     b.Text = label
-    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 7)
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
     Instance.new("UIStroke", b).Color = Color3.fromRGB(60, 60, 60)
 
     b.MouseButton1Click:Connect(function()
@@ -160,7 +160,7 @@ local GoldBtn = MakeButton(FarmM, "GOLD FARM : OFF", Color3.fromRGB(200, 40, 40)
 local DiamondBtn = MakeButton(FarmM, "DIAMOND FARM : OFF", Color3.fromRGB(200, 40, 40))
 MakeButton(FarmM, "BACK", Color3.fromRGB(120, 30, 30), function() ShowMenu("Main") end)
 
--- ================== PET EGG MENU (3 cột, nút ngắn gọn) ==================
+-- ================== PET EGG MENU (3 cột - nhỏ gọn) ==================
 local function teleportTo(pos)
     local char = LP.Character
     if char and char:FindFirstChild("HumanoidRootPart") then
@@ -233,4 +233,4 @@ ToggleBtn.MouseButton1Click:Connect(function()
     if MainFrame.Visible then ShowMenu("Main") end
 end)
 
-print("✅ HAAXSOHAI HUB loaded - Pet Egg Menu đã ngắn gọn, 3 cột")
+print("✅ HAAXSOHAI HUB loaded - Pet Egg Menu đã nhỏ gọn hơn")
