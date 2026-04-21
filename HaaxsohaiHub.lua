@@ -11,14 +11,12 @@ _G.Config = {
     DiamondEnabled = false,
 }
 
+-- ================== GOLD WAYPOINTS MỚI ==================
 local goldWaypoints = {
-    Vector3.new(41.32, 504.59, 51.67),
-    Vector3.new(-64.23, 504.59, 47.03),
-    Vector3.new(-48.08, 560.59, 14.17),
-    Vector3.new(49.07, 560.59, 0.25),
-    Vector3.new(-47.81, 621.59, -63.48),
-    Vector3.new(64.43, 637.59, -64.91),
-    Vector3.new(48.08, 702.59, 12.47)
+    Vector3.new(40.81, 704.59, 47.63),
+    Vector3.new(-49.16, 772.59, 47.60),
+    Vector3.new(-47.06, 772.59, -47.20),
+    Vector3.new(48.23, 827.59, -48.74)
 }
 
 local diamondWaypoints = {
@@ -201,7 +199,7 @@ local function diamondLoop()
     end
 end
 
--- ================== TOGGLE GOLD (Phiên bản mạnh) ==================
+-- ================== TOGGLE GOLD ==================
 GoldBtn.MouseButton1Click:Connect(function()
     _G.Config.GoldEnabled = not _G.Config.GoldEnabled
 
@@ -210,7 +208,6 @@ GoldBtn.MouseButton1Click:Connect(function()
         GoldBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 80)
         GoldBtn.Text = "GOLD FARM : ON"
         
-        -- Dừng thread cũ nếu có
         if goldThread then 
             pcall(function() coroutine.close(goldThread) end) 
         end
@@ -228,7 +225,7 @@ GoldBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- ================== TOGGLE DIAMOND (Phiên bản mạnh) ==================
+-- ================== TOGGLE DIAMOND ==================
 DiamondBtn.MouseButton1Click:Connect(function()
     _G.Config.DiamondEnabled = not _G.Config.DiamondEnabled
 
@@ -260,4 +257,4 @@ ToggleBtn.MouseButton1Click:Connect(function()
     if MainFrame.Visible then ShowMenu("Main") end
 end)
 
-print("✅ HAAXSOHAI HUB loaded - Fix mạnh lỗi tele loạn khi ấn nhiều lần")
+print("✅ HAAXSOHAI HUB loaded - Gold farm đã update tọa độ mới")
