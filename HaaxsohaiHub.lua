@@ -13,24 +13,30 @@ _G.Config = {
 
 -- ================== GOLD WAYPOINTS MỚI ==================
 local goldWaypoints = {
-    Vector3.new(40.81, 704.59, 47.63),
-    Vector3.new(-49.16, 772.59, 47.60),
-    Vector3.new(-47.06, 772.59, -47.20),
-    Vector3.new(48.23, 827.59, -48.74)
+    Vector3.new(41.94, 904.79, 49.60),
+    Vector3.new(1.48, 1002.79, -49.28),
+    Vector3.new(-47.24, 1002.79, 37.74),
+    Vector3.new(-65.48, 1002.79, -64.64),
+    Vector3.new(63.99, 1102.79, 14.99),
+    Vector3.new(-0.49, 1102.79, 47.86)
 }
 
+-- ================== DIAMOND WAYPOINTS (cũ + mới) ==================
 local diamondWaypoints = {
     Vector3.new(0.02, 130.59, 0.65),
     Vector3.new(-49.21, 261.59, -37.39),
     Vector3.new(-48.52, 458.59, 48.13),
-    Vector3.new(47.74, 621.59, -48.47)
+    Vector3.new(47.74, 621.59, -48.47),
+    Vector3.new(-48.77, 1002.79, -48.68)  -- Tọa độ mới
 }
 
+-- ================== EGG POSITIONS (cũ + Vampire mới) ==================
 local eggPositions = {
     Noob   = Vector3.new(43.76, 1.70, -17.58),
     Bacon  = Vector3.new(43.26, 1.70, -1.28),
     Party  = Vector3.new(43.65, 1.70, 14.96),
-    Hacker = Vector3.new(-13.76, 503.69, 76.01)
+    Hacker = Vector3.new(-13.76, 503.69, 76.01),
+    Vampire = Vector3.new(-12.94, 904.79, 11.31)  -- Egg mới
 }
 
 local goldDelay = 0.25
@@ -106,7 +112,7 @@ local function ShowMenu(name)
     for k, v in pairs(Menus) do v.Visible = (k == name) end
     if name == "Main" then Resize(280, 190)
     elseif name == "Farm" then Resize(280, 195)
-    elseif name == "Egg" then Resize(280, 200) end
+    elseif name == "Egg" then Resize(280, 230) end  -- Tăng chiều cao vì thêm egg
 end
 
 local MainM = CreateFrame("Main")
@@ -161,6 +167,7 @@ MakeButton(EggM, "EGG NOOB", Color3.fromRGB(100, 100, 100), function() teleportT
 MakeButton(EggM, "EGG BACON", Color3.fromRGB(180, 100, 50), function() teleportTo(eggPositions.Bacon) end)
 MakeButton(EggM, "EGG PARTY", Color3.fromRGB(255, 100, 200), function() teleportTo(eggPositions.Party) end)
 MakeButton(EggM, "EGG HACKER", Color3.fromRGB(0, 200, 100), function() teleportTo(eggPositions.Hacker) end)
+MakeButton(EggM, "EGG VAMPIRE", Color3.fromRGB(180, 0, 180), function() teleportTo(eggPositions.Vampire) end)  -- Egg mới
 MakeButton(EggM, "BACK", Color3.fromRGB(120, 30, 30), function() ShowMenu("Main") end)
 
 -- ================== GOLD LOOP ==================
@@ -257,4 +264,4 @@ ToggleBtn.MouseButton1Click:Connect(function()
     if MainFrame.Visible then ShowMenu("Main") end
 end)
 
-print("✅ HAAXSOHAI HUB loaded - Gold farm đã update tọa độ mới")
+print("✅ HAAXSOHAI HUB loaded - Gold + Diamond + Vampire Egg đã update!")
